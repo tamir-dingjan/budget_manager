@@ -4,6 +4,7 @@ from budget_manager.logic import (
     create_budget_category,
     add_single_transaction,
     add_transactions_from_file,
+    generate_report,
 )
 
 
@@ -106,3 +107,37 @@ def test_add_transactions_from_file(db_conn):
     assert rows[1][1] == 120.0
     assert rows[1][2] == "2024-02-02"
     assert rows[1][3] == "Concert tickets"
+
+
+def test_generate_report(db_conn):
+    # Insert budget categories and transactions
+    create_budget_category("Groceries", 300.0, connection=db_conn)
+    create_budget_category("Entertainment", 150.0, connection=db_conn)
+
+    add_single_transaction(
+        "Groceries", 50.0, "2024-01-15", "Weekly groceries", connection=db_conn
+    )
+    add_single_transaction(
+        "Groceries", 75.0, "2024-01-22", "Monthly bulk shopping", connection=db_conn
+    )
+    add_single_transaction(
+        "Entertainment", 120.0, "2024-01-20", "Concert tickets", connection=db_conn
+    )
+
+    # Generate report
+    tmp = NamedTemporaryFile(delete=False, delete_on_close=False)
+    result = generate_report(tmp.name, connection=db_conn)
+
+    assert result == f"Report written to {tmp.name}."
+
+    # Validate the contents of the report
+    df = pl.read_csv(tmp.name)
+    assert df.shape[0] == 2, "Report should contain 2 budget categories."
+
+    groceries_row = df.filter(pl.col("budget_name") == "Groceries")
+    assert groceries_row["total_spent"][0] == 125.0
+    assert groceries_row["percent_spent"][0] == (125.0 / 300.0 * 100)
+
+    entertainment_row = df.filter(pl.col("budget_name") == "Entertainment")
+    assert entertainment_row["total_spent"][0] == 120.0
+    assert entertainment_row["percent_spent"][0] == (120.0 / 150.0 * 100)

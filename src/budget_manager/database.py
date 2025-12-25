@@ -48,6 +48,16 @@ def get_budget_id_by_name(connection, name: str) -> int | None:
     return None
 
 
+def get_budget_amount_by_name(connection, name: str) -> float | None:
+    cursor = connection.cursor()
+    query = "SELECT amount FROM budgets WHERE name=?"
+    cursor.execute(query, (name,))
+    row = cursor.fetchone()
+    if row:
+        return row[0]
+    return None
+
+
 def insert_budget(connection, name: str, amount: float) -> bool:
     try:
         cursor = connection.cursor()
@@ -72,3 +82,19 @@ def insert_transaction(
     except sqlite3.Error as e:
         print(f"Database error: {e}")
         return False
+
+
+def get_all_budget_names(connection):
+    cursor = connection.cursor()
+    query = "SELECT name FROM budgets"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    return [row[0] for row in rows]
+
+
+def select_transactions_by_budget_id(connection, budget_id: int):
+    cursor = connection.cursor()
+    query = "SELECT amount, date, description FROM transactions WHERE budget_id=?"
+    cursor.execute(query, (budget_id,))
+    rows = cursor.fetchall()
+    return rows

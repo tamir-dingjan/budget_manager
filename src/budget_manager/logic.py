@@ -1,9 +1,14 @@
+from math import fsum
+import polars as pl
 from budget_manager.io import read_csv_to_dataframe
 from budget_manager.database import (
+    get_budget_amount_by_name,
     get_connection,
     insert_budget,
     get_budget_id_by_name,
     insert_transaction,
+    get_all_budget_names,
+    select_transactions_by_budget_id,
 )
 
 
@@ -105,6 +110,54 @@ def add_transactions_from_file(file_path: str, connection=None) -> str:
     return "All transactions from the file added successfully."
 
 
-def generate_report(output_file: str) -> str:
-    # Placeholder for report generation logic
-    return "Report generation not yet implemented."
+def generate_report(output_file: str, connection=None) -> str:
+    summary = {
+        "budget_name": [],
+        "budget_amount": [],
+        "total_spent": [],
+        "percent_spent": [],
+    }
+
+    # Get a connection if not provided
+    if connection is None:
+        connection = get_connection()
+        need_to_close = True
+    else:
+        need_to_close = False
+
+    # Get all budget categories in the database
+    budgets = get_all_budget_names(connection)
+
+    # Collect each budget category's transactions
+    for budget_name in budgets:
+        budget_id = get_budget_id_by_name(connection, budget_name)
+        budget_amount = get_budget_amount_by_name(connection, budget_name)
+        if budget_id is None:
+            return f"Error: Budget category '{budget_name}' does not exist."
+        if budget_amount is None:
+            return (
+                f"Error: Could not retrieve amount for budget category '{budget_name}'."
+            )
+
+        # Calculate total transaction amount
+        transactions = select_transactions_by_budget_id(connection, budget_id)
+        total = fsum([row[0] for row in transactions])
+        summary["budget_name"].append(budget_name)
+        summary["budget_amount"].append(budget_amount)
+        summary["total_spent"].append(total)
+        summary["percent_spent"].append((total / budget_amount * 100))
+
+    # Generate report for each budget category showing amount and % spent
+    df = pl.DataFrame(
+        summary,
+        schema={
+            "budget_name": pl.Utf8,
+            "budget_amount": pl.Float64,
+            "total_spent": pl.Float64,
+            "percent_spent": pl.Float64,
+        },
+    )
+
+    df.write_csv(output_file)
+
+    return f"Report written to {output_file}."
