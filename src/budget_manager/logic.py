@@ -16,6 +16,10 @@ def create_budget_category(name: str, amount: float, connection=None) -> str:
     # Validate the name and amount
     if not name.strip():
         return "Error: Budget name cannot be empty."
+    try:
+        amount = float(amount)
+    except ValueError:
+        return "Error: Amount must be a valid number."
     if amount <= 0:
         return "Error: Budget amount must be greater than zero."
 
