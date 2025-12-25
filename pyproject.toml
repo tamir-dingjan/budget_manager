@@ -1,0 +1,21 @@
+[project]
+name = "budget-manager"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Tamir Dingjan", email = "tamir.dingjan@gmail.com" }]
+requires-python = ">=3.13"
+dependencies = ["polars>=1.36.1"]
+
+[project.scripts]
+budget-manager = "budget_manager:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["pytest>=9.0.2", "ruff>=0.14.10"]
+
+[tool.ruff.lint]
+extend-select = ["B"]
