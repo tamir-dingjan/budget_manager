@@ -52,7 +52,7 @@ def run(args=None, connection=None) -> None:
         result = create_budget_categories_from_file(
             args.add_budget_file, connection=connection
         )
-        print("Budget category import from file not yet implemented.")
+        print(result)
 
     if args.add_transactions:
         print(f"Importing transactions from: {args.add_transactions}")
