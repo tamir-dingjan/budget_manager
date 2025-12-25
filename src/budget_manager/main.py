@@ -1,5 +1,5 @@
 import argparse
-from budget_manager.database import get_connection
+from budget_manager.database import initialise_database
 from budget_manager.logic import (
     create_budget_category,
     add_transactions_from_file,
@@ -34,7 +34,7 @@ def run(args=None, connection=None) -> None:
         args = parser.parse_args(args)
 
     if connection is None:
-        connection = get_connection()
+        connection = initialise_database()
         need_to_close = True
     else:
         need_to_close = False
