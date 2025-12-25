@@ -71,7 +71,7 @@ def test_cli_add_transactions_from_file(db_conn):
     ).write_csv(tmp.name)
 
     args = [
-        "--add_transactions",
+        "--add-transactions",
         tmp.name,
     ]
     run(args=args, connection=db_conn)
@@ -141,7 +141,7 @@ def test_cli_generate_report(db_conn):
     args = [
         "--add-budget-file",
         tmp_budget.name,
-        "--add_transactions",
+        "--add-transactions",
         tmp_transactions.name,
         "--report",
         tmp_report.name,

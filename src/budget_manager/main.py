@@ -21,7 +21,7 @@ def run(args=None, connection=None) -> None:
         help="Add budget categories from a CSV file.",
     )
     parser.add_argument(
-        "--add_transactions",
+        "--add-transactions",
         metavar="FILE",
         help="Import transactions from a CSV file.",
     )
