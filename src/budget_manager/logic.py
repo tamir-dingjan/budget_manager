@@ -38,6 +38,39 @@ def create_budget_category(name: str, amount: float, connection=None) -> str:
         return "Error: Failed to add budget."
 
 
+def create_budget_categories_from_file(file_path: str, connection=None) -> str:
+    df = read_csv_to_dataframe(file_path)
+    if df is None:
+        return "Error: Failed to read budget categories from the file."
+
+    # Validate the budget categories data
+    # Each budget category must have the following fields: name, amount
+    required_columns = {"name", "amount"}
+    if not required_columns.issubset(set(df.columns)):
+        return f"Error: CSV file must contain the following columns: {', '.join(required_columns)}."
+
+    # Get a connection if not provided
+    if connection is None:
+        connection = get_connection()
+        need_to_close = True
+    else:
+        need_to_close = False
+
+    # add each budget category separately
+    for row in df.iter_rows(named=True):
+        name = row["name"]
+        amount = row["amount"]
+
+        result = create_budget_category(name, amount, connection=connection)
+        if result.startswith("Error"):
+            return f"Error adding budget category from file: {result}"
+
+    if need_to_close:
+        connection.close()
+
+    return "All budget categories from the file added successfully."
+
+
 def add_single_transaction(
     budget_name: str, amount: float, date: str, description: str, connection=None
 ) -> str:
@@ -146,6 +179,9 @@ def generate_report(output_file: str, connection=None) -> str:
         summary["budget_amount"].append(budget_amount)
         summary["total_spent"].append(total)
         summary["percent_spent"].append((total / budget_amount * 100))
+
+    if need_to_close:
+        connection.close()
 
     # Generate report for each budget category showing amount and % spent
     df = pl.DataFrame(

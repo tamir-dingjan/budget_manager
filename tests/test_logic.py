@@ -2,6 +2,7 @@ import polars as pl
 from tempfile import NamedTemporaryFile
 from budget_manager.logic import (
     create_budget_category,
+    create_budget_categories_from_file,
     add_single_transaction,
     add_transactions_from_file,
     generate_report,
@@ -28,6 +29,33 @@ def test_create_budget_category(db_conn):
     # Test with negative amount
     result = create_budget_category("Rent", -500.0, connection=db_conn)
     assert result == "Error: Budget amount must be greater than zero."
+
+
+def test_create_budget_categories_from_file(db_conn):
+    # Create a temporary CSV file with budget categories
+    tmp = NamedTemporaryFile(delete=False, delete_on_close=False)
+    pl.DataFrame(
+        {
+            "name": ["Groceries", "Transport", "Entertainment"],
+            "amount": [300.0, 100.0, 150.0],
+        }
+    ).write_csv(tmp.name)
+
+    # Test creating budget categories from the file
+    result = create_budget_categories_from_file(tmp.name, connection=db_conn)
+    tmp.close()
+
+    assert result == "All budget categories from the file added successfully."
+
+    # Verify that budget categories were added
+    cursor = db_conn.cursor()
+    cursor.execute("SELECT name, amount FROM budgets;")
+    rows = cursor.fetchall()
+    budget_dict = {row[0]: row[1] for row in rows}
+
+    assert budget_dict["Groceries"] == 300.0
+    assert budget_dict["Transport"] == 100.0
+    assert budget_dict["Entertainment"] == 150.0
 
 
 def test_add_single_transaction(db_conn):
