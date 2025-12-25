@@ -1,4 +1,3 @@
-import pytest
 
 
 def test_read_csv_file_to_dataframe(tmp_path):

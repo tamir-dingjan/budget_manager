@@ -1,4 +1,5 @@
 import polars
+import os
 
 
 def read_csv_to_dataframe(file_path: str) -> polars.DataFrame:
@@ -10,4 +11,11 @@ def read_csv_to_dataframe(file_path: str) -> polars.DataFrame:
     Returns:
         polars.DataFrame: The contents of the CSV file as a Polars DataFrame.
     """
-    return polars.read_csv(file_path)
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
+    else:
+        try:
+            return polars.read_csv(file_path)
+        except Exception as e:
+            raise RuntimeError(f"Failed to read CSV file {file_path}: {e}") from e
+            return None

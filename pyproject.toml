@@ -8,14 +8,17 @@ requires-python = ">=3.13"
 dependencies = ["polars>=1.36.1"]
 
 [project.scripts]
-budget-manager = "budget_manager:main"
+budget-manager = "budget_manager.main:run"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["pytest>=9.0.2", "ruff>=0.14.10"]
+dev = ["pytest>=9.0.2", "pytest-cov>=7.0.0", "ruff>=0.14.10"]
 
 [tool.ruff.lint]
 extend-select = ["B"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=budget_manager --cov-report=term-missing"
