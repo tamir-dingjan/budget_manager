@@ -2,10 +2,23 @@
 
 This is a minimal budget management and expense tracking tool, designed as a self-directed project for the Boot.dev course.
 
+## Quick Start
+To see the budget manager in action with sample data:
+
+1. Install the package:
+`pip install -e .`
+
+2. Run the demo script:
+> `cd example`
+
+> `chmod +x run_example.sh`
+
+> `./run_example.sh`
+
+
 ## Features
 - Create budget categories to track expenses for different purposes.
-- Enter transactions individually or in bulk from a CSV file.
-- Set up alerts for high spending thresholds.
+- Enter transactions in bulk from a CSV file.
 - Export spending summary reports in CSV format.
 
 ### Not yet implemented

@@ -1,0 +1,11 @@
+budget_name,budget_amount,total_spent,percent_spent
+Housing,1500.0,1500.0,100.0
+Groceries,450.0,304.75,67.72222222222221
+Utilities,200.0,200.0,100.0
+Transportation,300.0,140.0,46.666666666666664
+Insurance,150.0,150.0,100.0
+Healthcare,100.0,100.0,100.0
+Dining Out,150.0,130.0,86.66666666666667
+Entertainment,100.0,67.99,67.99
+Savings,500.0,500.0,100.0
+Miscellaneous,100.0,47.0,47.0
